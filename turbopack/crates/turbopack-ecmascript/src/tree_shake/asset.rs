@@ -369,19 +369,17 @@ impl Module for EcmascriptModulePartAsset {
 
         references.extend(
             deps.iter()
-                .filter_map(|part_id| {
-                    Some(part_dep(match part_id {
+                .map(|part_id| {
+                    part_dep(match part_id {
                         // This is an internal part that is not for evaluation, so we don't need to
                         // force-add it.
-                        PartId::Internal(.., false) => return None,
-                        PartId::Internal(part_id, true) => {
-                            ModulePart::internal_evaluation(*part_id)
-                        }
+                        // PartId::Internal(.., false) => return None,
+                        PartId::Internal(part_id, _) => ModulePart::internal_evaluation(*part_id),
                         PartId::Export(name) => ModulePart::export(name.clone()),
                         _ => unreachable!(
                             "PartId other than Internal and Export should not be used here"
                         ),
-                    }))
+                    })
                 })
                 .collect::<Vec<_>>(),
         );
