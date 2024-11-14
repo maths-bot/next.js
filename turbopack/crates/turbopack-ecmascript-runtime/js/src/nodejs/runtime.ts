@@ -143,11 +143,13 @@ async function loadChunkAsync(
     const module = {
       exports: {},
     };
-    vm.runInThisContext(
+    // TODO: Use vm.runInThisContext but consider sourcemap support.
+    // eslint-disable-next-line no-eval -- Can't use vm.runInThisContext because it ignores sourceMappingURL
+    (0, eval)(
       "(function(module, exports, require, __dirname, __filename) {" +
         contents +
-        "\n})",
-      resolved
+        "\n})" +
+        "\n//# sourceURL=" + url.pathToFileURL(resolved),
     )(module, module.exports, localRequire, path.dirname(resolved), resolved);
 
     const chunkModules: ModuleFactories = module.exports;
